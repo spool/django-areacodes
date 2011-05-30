@@ -67,4 +67,4 @@ class Exchange(models.Model):
     objects = models.GeoManager()
 
     def __unicode__(self):
-        return '%s, %s' % (self.city, self.state)
+        return '%s' % self.coordinates
