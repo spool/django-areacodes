@@ -61,6 +61,11 @@ class AreaCode(models.Model):
         self.coordinates = 'POINT(-%s %s)' % (self.longitude, self.latitude)
         self.save()
 
+    def set_exchange(self):
+        exchange, created = Exchange.objects.get_or_create(coordinates=area_code.coordinates)
+        area_code.exchange = exchange
+        area_code.save()
+
 class Exchange(models.Model):
     coordinates = models.PointField()
 
