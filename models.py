@@ -24,6 +24,7 @@ class AreaCode(models.Model):
             )
     type = models.CharField(max_length=1, choices=TYPE_CHOICES)
     coordinates = models.PointField(blank=True, null=True)
+    geo_coordinates = models.PointField(blank=True, null=True, geography=True)
     tract = models.ForeignKey('census1990.CensusTract', blank=True, null=True, related_name="area_codes")
     puma = models.ForeignKey('ipums.PUMA', blank=True, null=True, related_name="area_codes")
     fixed_puma = models.BooleanField(default=False)
