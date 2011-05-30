@@ -62,15 +62,7 @@ class AreaCode(models.Model):
         self.save()
 
 class Exchange(models.Model):
-    city = models.CharField(max_length=30)
-    state = models.CharField(max_length=2)
     coordinates = models.PointField()
-    TYPE_CHOICES = (
-            ('L', 'Land'),
-            ('W', 'Wire Center'),
-            ('?', 'Unknown'),
-            )
-    type = models.CharField(max_length=1, choices=TYPE_CHOICES)
 
     objects = models.GeoManager()
 
