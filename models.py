@@ -14,6 +14,7 @@ class USAreaCodeManager(models.GeoManager):
 class AreaCode(models.Model):
     npa = models.IntegerField()
     nxx = models.IntegerField()
+    exchange = models.ForeignKey('Exchange', related_name="area_codes", blank=True, null=True)
     latitude = models.CharField(max_length=5)
     longitude = models.CharField(max_length=6)
     state = models.CharField(max_length=2)
@@ -59,3 +60,19 @@ class AreaCode(models.Model):
     def set_coordinates(self):
         self.coordinates = 'POINT(-%s %s)' % (self.longitude, self.latitude)
         self.save()
+
+class Exchange(models.Model):
+    city = models.CharField(max_length=30)
+    state = models.CharField(max_length=2)
+    coordinates = models.PointField()
+    TYPE_CHOICES = (
+            ('L', 'Land'),
+            ('W', 'Wire Center'),
+            ('?', 'Unknown'),
+            )
+    type = models.CharField(max_length=1, choices=TYPE_CHOICES)
+
+    objects = models.GeoManager()
+
+    def __unicode__(self):
+        return '%s, %s' % (self.city, self.state)
