@@ -71,5 +71,8 @@ class Exchange(models.Model):
 
     objects = models.GeoManager()
 
+    def dates():
+        return self.area_codes.filter(phone_numbers__node_time_points).values_list('date', flat=True).unique()
+
     def __unicode__(self):
-        return '%s' % self.coordinates
+        return '%s, %s' % (self.coordinates, self.area_codes.all()[0])
