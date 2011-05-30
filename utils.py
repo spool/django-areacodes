@@ -1,4 +1,5 @@
-from models import AreaCode
+from models import AreaCode, Exchange
+from phone_numbers import phone_data
 from django.conf import settings
 import os
 
@@ -25,3 +26,42 @@ def map_tracts(area_codes=AreaCode.us.filter(tract__isnull=True)):
             errors.append(a)
     return errors
     
+def city_var(exchanges=Exchange.objects.all()):
+    errors = []
+    for e in exchanges:
+        ref = e.area_codes.all()[0]
+        for a in e.area_codes.all()[1:]:
+            if ref.city != a.city: 
+                errors.append(e)
+                break
+    return errors
+
+def state_var(exchanges=Exchange.objects.all()):
+    errors = []
+    for e in exchanges:
+        ref = e.area_codes.all()[0]
+        for a in e.area_codes.all()[1:]:
+            if ref.state != a.state: 
+                errors.append(e)
+                break
+    return errors
+
+def type_var(exchanges=Exchange.objects.all()):
+    errors = []
+    for e in exchanges:
+        ref = e.area_codes.all()[0]
+        for a in e.area_codes.all()[1:]:
+            if ref.type != a.type: 
+                errors.append(e)
+                break
+    return errors
+
+def country_var(exchanges=Exchange.objects.all()):
+    errors = []
+    us_exchanges = Exchange.objects.filter(area_codes__in=AreaCode.us.all())
+    for e in us_exchanges:
+        for a in e.area_codes.all()[1:]:
+            if a.npa in phone_data.CARRIBEAN_AREACODES + phone_data.CARRIBEAN_AREACODES:
+                errors.append(e)
+                break
+    return errors
