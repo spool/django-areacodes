@@ -1,5 +1,5 @@
 from django.contrib.gis.db import models
-from census1990.models import CensusTract
+from nhgis.models import Tract
 from ipums.models import PUMA
 from phone_numbers import phone_data
 from ipums.fips import US_STATE_CHAR2FIPS
@@ -66,13 +66,52 @@ class AreaCode(models.Model):
         self.exchange = exchange
         self.save()
 
+class USExchangeManager(models.GeoManager):
+
+    def get_query_set(self):
+            return super(USAreaCodeManager, self).get_query_set().filter(area_codes__in=AreaCode.us.all())
+
 class Exchange(models.Model):
     coordinates = models.PointField()
+    tract = models.ForeignKey('nhgis.Tract', blank=True, null=True, related_name='tracts')
+    fixed_tract= models.BooleanField()
+    puma = models.ForeignKey('ipums.PUMA', blank=True, null=True, related_name='tracts')
+    fixed_puma = models.BooleanField()
 
     objects = models.GeoManager()
+    us = USExchangeManager()
 
-    def dates():
+    def dates(self):
         return self.area_codes.filter(phone_numbers__node_time_points).values_list('date', flat=True).unique()
+
+    def set_tract(self):
+        try:
+            self.tract = Tract.objects.get(geom__contains=self.coordinates)
+        except Tract.DoesNotExist:
+            try:
+                qs = Tract.objects.filter(statefip=US_STATE_CHAR2FIPS[self.state]+'0')
+                self.tract = qs.distance(self.coordinates).order_by('distance')[0]
+                self.fixed_tract = True
+                print 'Nearest in-state tract to %s is %s %s' % (self, self.coordinates, self.puma, self.puma.geom.centroid)
+            except IndexError:
+                print "Could not find tract for %s" % self
+                return self
+        self.save()
+
+    def set_puma(self):
+        try:
+            self.puma = PUMA.objects.get(geom__contains=self.coordinates)
+        except PUMA.DoesNotExist:
+            try:
+                qs = PUMA.objects.filter(statefip=US_STATE_CHAR2FIPS[self.state])
+                self.puma = qs.distance(self.coordinates).order_by('distance')[0]
+                self.fixed_puma = True
+                print 'Nearest in-state to %s is %s %s' % (self, self.coordinates, self.puma, self.puma.geom.centroid)
+            except IndexError:
+                print "Could not find PUMA for %s" % self
+                return self
+        self.save()
 
     def __unicode__(self):
         return '%s, %s' % (self.coordinates, self.area_codes.all()[0])
+
