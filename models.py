@@ -9,7 +9,8 @@ from ipums.fips import US_STATE_CHAR2FIPS
 class USAreaCodeManager(models.GeoManager):
 
     def get_query_set(self):
-            return super(USAreaCodeManager, self).get_query_set().exclude(npa__in=phone_data.CARRIBEAN_AREACODES + phone_data.CANADIAN_AREACODES)
+            return super(USAreaCodeManager, self).get_query_set().exclude(npa__in=phone_data.CARRIBEAN_AREACODES \
+                    + phone_data.CANADIAN_AREACODES)
 
 class USExchangeManager(models.GeoManager):
 
