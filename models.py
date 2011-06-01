@@ -69,13 +69,13 @@ class AreaCode(models.Model):
 class USExchangeManager(models.GeoManager):
 
     def get_query_set(self):
-            return super(USAreaCodeManager, self).get_query_set().filter(area_codes__in=AreaCode.us.all())
+            return super(USExchangeManager, self).get_query_set().filter(area_codes__in=AreaCode.us.all())
 
 class Exchange(models.Model):
     coordinates = models.PointField()
-    tract = models.ForeignKey('nhgis.Tract', blank=True, null=True, related_name='tracts')
+    tract = models.ForeignKey('nhgis.Tract', blank=True, null=True, related_name='exchanges')
     fixed_tract= models.BooleanField()
-    puma = models.ForeignKey('ipums.PUMA', blank=True, null=True, related_name='tracts')
+    puma = models.ForeignKey('ipums.PUMA', blank=True, null=True, related_name='exchanges')
     fixed_puma = models.BooleanField()
 
     objects = models.GeoManager()
