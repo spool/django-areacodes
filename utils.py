@@ -65,3 +65,17 @@ def country_var(exchanges=Exchange.objects.all()):
                 errors.append(e)
                 break
     return errors
+
+def set_pumas(exchanges=Exchange.us.all()):
+    errors = []
+    for e in exchanges:
+        if e.set_puma(): # Will return None if no error
+            errors.append(e)
+    return errors
+
+def set_tracts(exchanges=Exchange.us.all()):
+    errors = []
+    for e in exchanges:
+        if e.set_tract(): # Will return None if no error
+            errors.append(e)
+    return errors
