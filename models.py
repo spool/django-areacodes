@@ -84,17 +84,21 @@ class Exchange(models.Model):
     def dates(self):
         return self.area_codes.filter(phone_numbers__node_time_points).values_list('date', flat=True).unique()
 
+    def states(self):
+        return self.area_codes.values_list('state', flat=True)
+
     def set_tract(self):
         try:
             self.tract = Tract.objects.get(geom__contains=self.coordinates)
         except Tract.DoesNotExist:
             try:
-                qs = Tract.objects.filter(statefip=US_STATE_CHAR2FIPS[self.state]+'0')
+                states = [US_STATE_CHAR2FIPS[x] + '0' for x in self.states()]
+                qs = Tract.objects.filter(nhgisst__in=states)
                 self.tract = qs.distance(self.coordinates).order_by('distance')[0]
                 self.fixed_tract = True
-                print 'Nearest in-state tract to %s is %s %s' % (self, self.coordinates, self.puma, self.puma.geom.centroid)
-            except IndexError:
-                print "Could not find tract for %s" % self
+                print 'Nearest in-state tract to %s is %s %s' % (self, self.tract, self.tract.geom.centroid)
+            except:
+                print "Error with %s" % self
                 return self
         self.save()
 
@@ -103,12 +107,13 @@ class Exchange(models.Model):
             self.puma = PUMA.objects.get(geom__contains=self.coordinates)
         except PUMA.DoesNotExist:
             try:
-                qs = PUMA.objects.filter(statefip=US_STATE_CHAR2FIPS[self.state])
+                states = [US_STATE_CHAR2FIPS[x] for x in self.states()]
+                qs = PUMA.objects.filter(statefip__in=states)
                 self.puma = qs.distance(self.coordinates).order_by('distance')[0]
                 self.fixed_puma = True
-                print 'Nearest in-state to %s is %s %s' % (self, self.coordinates, self.puma, self.puma.geom.centroid)
-            except IndexError:
-                print "Could not find PUMA for %s" % self
+                print 'Nearest in-state PUMA to %s is %s %s' % (self, self.puma, self.puma.geom.centroid)
+            except:
+                print "Error with %s" % self
                 return self
         self.save()
 
