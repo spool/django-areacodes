@@ -59,6 +59,7 @@ class Exchange(models.Model):
     coordinates = models.PointField()
     puma = models.ForeignKey('ipums.PUMA', blank=True, null=True, related_name='exchanges')
     fixed_puma = models.BooleanField()
+    exchange_area = models.ForeignKey('exchange_areas.ExchangeArea', null=True, related_name='exchanges')
 
     objects = models.GeoManager()
     us = USExchangeManager()
