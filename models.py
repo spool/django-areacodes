@@ -2,7 +2,7 @@ from django.contrib.gis.db import models
 from census1990.models import CensusTract
 from ipums.models import PUMA
 from phone_numbers import phone_data
-from ipums.fips import US_STATE_CHAR2FIPS
+from fips import US_STATE_CHAR2FIPS
 
 # Create your models here.
 
