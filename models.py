@@ -46,6 +46,9 @@ class AreaCode(models.Model):
         return '(%d) - %d: %s, %s (%s)' % \
                 (self.npa, self.nxx, self.city, self.state, self.type)
 
+    class Meta:
+        unique_together = ('npa', 'nxx')
+
     def strip_city(self):
         self.city = self.city.strip()
         self.save()
@@ -66,10 +69,11 @@ class Exchange(models.Model):
     cont_us = ContinentalUSExchangeManager()
 
     def dates(self):
-        return self.area_codes.filter(phone_numbers__node_time_points).values_list('date', flat=True).unique()
+        #TODO fix this query
+        return self.area_codes.filter(phone_numbers__node_time_points).values_list('date', flat=True).distinct()
 
     def states(self):
-        return self.area_codes.values_list('state', flat=True)
+        return self.area_codes.values_list('state', flat=True).distinct()
 
     #def set_tract(self):
     #    try:
